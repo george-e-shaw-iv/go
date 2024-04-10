@@ -8,28 +8,46 @@ import (
 )
 
 func TestStack(t *testing.T) {
-	var st stack.Stack[int]
+	tt := []struct {
+		Name           string
+		Implementation stack.Stack[int]
+	}{
+		{
+			Name:           "Classic",
+			Implementation: stack.NewClassic[int](),
+		},
+		{
+			Name:           "QueueBased",
+			Implementation: stack.NewQueueBased[int](),
+		},
+	}
 
-	st.Push(0)
-	st.Push(1)
-	st.Push(2)
+	for _, test := range tt {
+		test := test
 
-	assert.Equal(t, 3, st.Len())
-	assert.Equal(t, 2, st.Top())
+		t.Run(test.Name, func(t *testing.T) {
+			test.Implementation.Push(0)
+			test.Implementation.Push(1)
+			test.Implementation.Push(2)
 
-	st.Pop()
-	st.Pop()
+			assert.Equal(t, 3, test.Implementation.Len())
+			assert.Equal(t, 2, test.Implementation.Top())
 
-	assert.Equal(t, 1, st.Len())
-	assert.Equal(t, 0, st.Top())
+			test.Implementation.Pop()
+			test.Implementation.Pop()
 
-	st.Push(3)
+			assert.Equal(t, 1, test.Implementation.Len())
+			assert.Equal(t, 0, test.Implementation.Top())
 
-	assert.Equal(t, 2, st.Len())
-	assert.Equal(t, 3, st.Top())
+			test.Implementation.Push(3)
 
-	st.Pop()
-	st.Pop()
+			assert.Equal(t, 2, test.Implementation.Len())
+			assert.Equal(t, 3, test.Implementation.Top())
 
-	assert.Equal(t, 0, st.Len())
+			test.Implementation.Pop()
+			test.Implementation.Pop()
+
+			assert.Equal(t, 0, test.Implementation.Len())
+		})
+	}
 }
