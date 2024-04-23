@@ -1,32 +1,30 @@
 package linkedlist
 
-import "golang.org/x/exp/constraints"
+var _ LinkedList[int] = &SingleHeadTail[int]{}
 
-var _ LinkedList[int] = &SinglyHeadTail[int]{}
-
-// SinglyHeadTail is a singly linked list that tracks both the head and the tail.
-type SinglyHeadTail[T constraints.Ordered] struct {
+// SingleHeadTail is a single linked list that tracks both the head and the tail.
+type SingleHeadTail[T comparable] struct {
 	head, tail *Node[T]
 	size       int
 }
 
-// NewSinglyHeadTail returns a singly linked list prepopulated with any nodes passed as
+// NewSingleHeadTail returns a single linked list prepopulated with any nodes passed as
 // arguments (linked in order of parameter index).
-func NewSinglyHeadTail[T constraints.Ordered](nodes ...*Node[T]) *SinglyHeadTail[T] {
-	ll := SinglyHeadTail[T]{}
+func NewSingleHeadTail[T comparable](nodes ...*Node[T]) *SingleHeadTail[T] {
+	ll := SingleHeadTail[T]{}
 	ll.InsertLast(nodes...)
 	return &ll
 }
 
-func (ll *SinglyHeadTail[T]) GetFirst() *Node[T] {
+func (ll *SingleHeadTail[T]) GetFirst() *Node[T] {
 	return ll.head
 }
 
-func (ll *SinglyHeadTail[T]) GetLast() *Node[T] {
+func (ll *SingleHeadTail[T]) GetLast() *Node[T] {
 	return ll.tail
 }
 
-func (ll *SinglyHeadTail[T]) Search(target T) *Node[T] {
+func (ll *SingleHeadTail[T]) Search(target T) *Node[T] {
 	for cur := ll.head; cur != nil; {
 		if cur.Data == target {
 			return cur
@@ -37,7 +35,7 @@ func (ll *SinglyHeadTail[T]) Search(target T) *Node[T] {
 	return nil
 }
 
-func (ll *SinglyHeadTail[T]) ToArray() []T {
+func (ll *SingleHeadTail[T]) ToArray() []T {
 	var arr []T
 	for cur := ll.head; cur != nil; cur = cur.Next {
 		arr = append(arr, cur.Data)
@@ -45,7 +43,7 @@ func (ll *SinglyHeadTail[T]) ToArray() []T {
 	return arr
 }
 
-func (ll *SinglyHeadTail[T]) InsertFirst(nodes ...*Node[T]) {
+func (ll *SingleHeadTail[T]) InsertFirst(nodes ...*Node[T]) {
 	for i := range nodes {
 		nodes[i].Next = ll.head
 		ll.head = nodes[i]
@@ -58,7 +56,7 @@ func (ll *SinglyHeadTail[T]) InsertFirst(nodes ...*Node[T]) {
 	}
 }
 
-func (ll *SinglyHeadTail[T]) InsertLast(nodes ...*Node[T]) {
+func (ll *SingleHeadTail[T]) InsertLast(nodes ...*Node[T]) {
 	for i := range nodes {
 		// This is the "seed node" case. If the list is empty, head and tail will be the same, which
 		// InsertFirst already takes care of.
@@ -73,7 +71,7 @@ func (ll *SinglyHeadTail[T]) InsertLast(nodes ...*Node[T]) {
 	}
 }
 
-func (ll *SinglyHeadTail[T]) InsertAfter(target T, nodes ...*Node[T]) error {
+func (ll *SingleHeadTail[T]) InsertAfter(target T, nodes ...*Node[T]) error {
 	after := ll.Search(target)
 	if after == nil {
 		return ErrTargetNoExist
@@ -91,7 +89,7 @@ func (ll *SinglyHeadTail[T]) InsertAfter(target T, nodes ...*Node[T]) error {
 	return nil
 }
 
-func (ll *SinglyHeadTail[T]) DeleteFirst() {
+func (ll *SingleHeadTail[T]) DeleteFirst() {
 	if ll.Size() == 0 {
 		return
 	}
@@ -111,7 +109,7 @@ func (ll *SinglyHeadTail[T]) DeleteFirst() {
 	ll.head = nxt
 }
 
-func (ll *SinglyHeadTail[T]) DeleteLast() {
+func (ll *SingleHeadTail[T]) DeleteLast() {
 	if ll.Size() == 0 {
 		return
 	}
@@ -143,11 +141,11 @@ func (ll *SinglyHeadTail[T]) DeleteLast() {
 	ll.tail = prev
 }
 
-func (ll *SinglyHeadTail[T]) Size() int {
+func (ll *SingleHeadTail[T]) Size() int {
 	return ll.size
 }
 
-func (ll *SinglyHeadTail[T]) Delete(target T) {
+func (ll *SingleHeadTail[T]) Delete(target T) {
 	if ll.Size() == 0 {
 		return
 	}
@@ -167,7 +165,7 @@ func (ll *SinglyHeadTail[T]) Delete(target T) {
 	}
 }
 
-func (ll *SinglyHeadTail[T]) Clear() {
+func (ll *SingleHeadTail[T]) Clear() {
 	ll.head = nil
 	ll.tail = nil
 	ll.size = 0

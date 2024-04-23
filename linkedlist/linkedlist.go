@@ -1,15 +1,11 @@
 package linkedlist
 
-import (
-	"errors"
-
-	"golang.org/x/exp/constraints"
-)
+import "errors"
 
 var ErrTargetNoExist = errors.New("target does not exist")
 
 // LinkedList is the interface that all linked list implementation should implement.
-type LinkedList[T constraints.Ordered] interface {
+type LinkedList[T comparable] interface {
 	GetFirst() *Node[T]
 	GetLast() *Node[T]
 	InsertFirst(nodes ...*Node[T])
@@ -27,12 +23,12 @@ type LinkedList[T constraints.Ordered] interface {
 var _ LinkedList[int] = &Classic[int]{}
 
 // Classic is a linked list that only tracks the head and is singly linked.
-type Classic[T constraints.Ordered] struct {
+type Classic[T comparable] struct {
 	head *Node[T]
 	size int
 }
 
-func NewClassic[T constraints.Ordered](nodes ...*Node[T]) *Classic[T] {
+func NewClassic[T comparable](nodes ...*Node[T]) *Classic[T] {
 	var ll Classic[T]
 	ll.InsertLast(nodes...)
 	return &ll

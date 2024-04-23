@@ -1,13 +1,11 @@
 package linkedlist
 
-import "golang.org/x/exp/constraints"
-
-type Node[T constraints.Ordered] struct {
+type Node[T comparable] struct {
 	Data       T
 	Next, Prev *Node[T]
 }
 
-func NewNode[T constraints.Ordered](val T) *Node[T] {
+func NewNode[T comparable](val T) *Node[T] {
 	return &Node[T]{
 		Data: val,
 	}

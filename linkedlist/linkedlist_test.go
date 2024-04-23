@@ -17,8 +17,12 @@ func TestLinkedList(t *testing.T) {
 			Implementation: linkedlist.NewClassic[int](),
 		},
 		{
-			Name:           "SinglyLinkedTrackHeadAndTail",
-			Implementation: linkedlist.NewSinglyHeadTail[int](),
+			Name:           "SingleLinkedTrackHeadAndTail",
+			Implementation: linkedlist.NewSingleHeadTail[int](),
+		},
+		{
+			Name:           "DoubleLinkedTrackHeadAndTail",
+			Implementation: linkedlist.NewDoubleHeadTail[int](),
 		},
 	}
 
