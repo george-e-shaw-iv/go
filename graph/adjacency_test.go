@@ -9,26 +9,22 @@ import (
 )
 
 func TestAdjancency(t *testing.T) {
-	g := graph.NewAdjacency(0, 1, 2, 3, 4, 5)
+	// vector<vector<int> > edges
+	//     = { { 0, 1 }, { 1, 2 }, { 3, 1 }, { 3, 2 } };
 
-	g.Debug(os.Stdout)
+	// // Graph represented as an adjacency list
+	// vector<vector<int> > adj(V);
 
-	g.AddEdge(0, 1)
-	g.AddEdge(0, 2)
-	g.AddEdge(0, 3)
-	g.AddEdge(0, 4)
-
-	g.AddEdge(3, 5)
-	g.AddEdge(1, 5)
-
-	fmt.Println("-----")
-
-	g.Debug(os.Stdout)
-
-	fmt.Println("-----")
-
-	fmt.Println(g.BFS(0))
-	fmt.Println(g.DFS(0))
+	// for (auto i : edges) {
+	//     adj[i[0]].push_back(i[1]);
+	// }
+	g2 := graph.NewAdjacency()
+	g2.AddEdge(0, 1)
+	g2.AddEdge(1, 2)
+	g2.AddEdge(3, 1)
+	g2.AddEdge(3, 2)
+	g2.Debug(os.Stdout)
+	fmt.Println(g2.TopologicalSort())
 
 	t.Fail()
 }

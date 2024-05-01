@@ -5,20 +5,21 @@ import (
 	"io"
 )
 
+var _ Graph = &Adjacency{}
+
 // Adjacency represents an undirected graph stored using an adjacency
 // list.
 type Adjacency struct {
 	data map[int][]int
+	opts *opts
 }
 
-func NewAdjacency(nodes ...int) *Adjacency {
+func NewAdjacency(options ...GraphOption) *Adjacency {
 	a := Adjacency{
 		data: make(map[int][]int),
+		opts: &opts{},
 	}
-
-	for i := range nodes {
-		a.AddNode(nodes[i])
-	}
+	a.opts.apply(options...)
 
 	return &a
 }
@@ -31,7 +32,12 @@ func (a *Adjacency) AddNode(node int) {
 
 func (a *Adjacency) AddEdge(from, to int) {
 	a.data[from] = append(a.data[from], to)
-	a.data[to] = append(a.data[to], from)
+
+	if a.opts.undirected {
+		a.data[to] = append(a.data[to], from)
+	} else {
+		a.AddNode(to) // only adds if it doesn't exist already
+	}
 }
 
 func (a *Adjacency) RemoveEdge(from, to int) {
@@ -60,7 +66,7 @@ func (a *Adjacency) RemoveEdge(from, to int) {
 	}
 }
 
-func (a *Adjacency) DeleteNode(node int) {
+func (a *Adjacency) RemoveNode(node int) {
 	if _, exists := a.data[node]; !exists {
 		return
 	}
@@ -82,17 +88,17 @@ func (a *Adjacency) BFS(start int) []int {
 		return nil
 	}
 
-	visited := make([]bool, len(a.data))
+	visited := make(map[int]struct{}, len(a.data))
 	queue, order := []int{start}, []int{start}
-	visited[start] = true
+	visited[start] = struct{}{}
 
 	for len(queue) != 0 {
 		current := queue[0]
 		queue = queue[1:]
 
 		for _, edge := range a.data[current] {
-			if !visited[edge] {
-				visited[edge] = true
+			if _, exists := visited[edge]; !exists {
+				visited[edge] = struct{}{}
 				order = append(order, edge)
 				queue = append(queue, edge)
 			}
@@ -102,25 +108,85 @@ func (a *Adjacency) BFS(start int) []int {
 	return order
 }
 
-func (a *Adjacency) DFS(start int) []int {
+func (a *Adjacency) DFSIterative(start int) []int {
 	if _, exists := a.data[start]; !exists {
 		return nil
 	}
 
 	stack := []int{start}
-	var order []int
-	visited := make([]bool, len(a.data))
+	order := make([]int, 0, len(a.data))
+	visited := make(map[int]struct{}, len(a.data))
 
 	for len(stack) != 0 {
 		currentNode := stack[len(stack)-1]
 		stack = stack[:len(stack)-1]
 
-		if !visited[currentNode] {
-			visited[currentNode] = true
+		if _, exists := visited[currentNode]; !exists {
+			visited[currentNode] = struct{}{}
 			order = append(order, currentNode)
 			stack = append(stack, a.data[currentNode]...)
 		}
 	}
 
 	return order
+}
+
+func (a *Adjacency) DFSRecursive(start int) []int {
+	if _, exists := a.data[start]; !exists {
+		return nil
+	}
+
+	order := make([]int, 0, len(a.data))
+	visited := make(map[int]struct{}, len(a.data))
+
+	var dfs func(node int)
+	dfs = func(node int) {
+		if _, exists := visited[node]; exists {
+			return
+		}
+
+		order = append(order, node)
+		visited[node] = struct{}{}
+
+		for i := range a.data[node] {
+			dfs(a.data[node][i])
+		}
+	}
+
+	dfs(start)
+	return order
+}
+
+func (a *Adjacency) TopologicalSort() ([]int, error) {
+	order, orderIdx := make([]int, len(a.data)), len(a.data)-1
+	visited := make(map[int]struct{}, len(a.data))
+	visiting := make(map[int]struct{}, len(a.data))
+
+	var err error
+	var dfs func(node int)
+	dfs = func(node int) {
+		if _, exists := visited[node]; exists {
+			return
+		}
+
+		if _, exists := visiting[node]; exists {
+			err = ErrGraphHasCycle
+			return
+		}
+
+		visiting[node] = struct{}{}
+		for i := range a.data[node] {
+			dfs(a.data[node][i])
+		}
+		delete(visiting, node)
+
+		visited[node] = struct{}{}
+		order[orderIdx] = node
+		orderIdx--
+	}
+
+	for node := range a.data {
+		dfs(node)
+	}
+	return order, err
 }
